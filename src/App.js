@@ -1,24 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useReducer} from 'react';
 import './App.css';
+import {rootReducer} from "./reducers/rootReducer";
+import {setInitial} from "./actions/actions";
+import {Content} from "./components/Content";
+
+export const RootContext = React.createContext();
 
 function App() {
+  const [rootState, rootStateDispatch] =  useReducer(rootReducer, {contentReactions : [], users : [], supportedReactions : []});
+
+  useEffect( ()=>{
+    setInitial().then((resp)=> {
+      rootStateDispatch(resp)
+    });
+  },[]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <RootContext.Provider value={{rootState, rootStateDispatch}}>
+        {rootState.contentReactions.length ? <Content /> : ""}
+      </RootContext.Provider>
     </div>
   );
 }
