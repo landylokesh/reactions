@@ -20,19 +20,21 @@ export const Reactions =(props)=>{
         return currentUserReaction;
     };
 
-    const reactionUpdateAction = (data, action)=>{
-        if(action === "ADD"){
-            const {reaction_id} = data;
+    const reactionUpdateAction = (data)=>{
+        const {reaction_id} = data;
+        const cUserData = currentUserReaction();
+        if(cUserData && cUserData.reaction_id === reaction_id){
+            console.log('cUser',cUserData.reaction_id, 'reaction_id', reaction_id);
+            deleteAReaction(cUserData.id).then(actionObj=>{
+                rootContext.rootStateDispatch(actionObj);
+            });
+        }else{
             const contReactionData = {
                 content_id : 1,
                 reaction_id,
                 user_id : currentUser.id
             };
             setContentReaction(contReactionData).then(actionObj=>{
-                rootContext.rootStateDispatch(actionObj);
-            });
-        }else if(action === "DELETE"){
-            deleteAReaction(data.id).then(actionObj=>{
                 rootContext.rootStateDispatch(actionObj);
             });
         }
@@ -42,10 +44,7 @@ export const Reactions =(props)=>{
         <div>
             <div className="reactionsToAddListParent">
             {props.reactions.map((value) => (
-                currentUserReaction() ?
-                    <ReactionToBeAdd currentData={currentUserReaction()} reaction={value} key={value.id} reactionUpdateAction={reactionUpdateAction}/>
-                    : <ReactionToBeAdd reaction={value} key={value.id} reactionUpdateAction={reactionUpdateAction}/>
-
+                <ReactionToBeAdd reaction={value} key={value.id} reactionUpdateAction={reactionUpdateAction}/>
             ))}
             </div>
             <div>
